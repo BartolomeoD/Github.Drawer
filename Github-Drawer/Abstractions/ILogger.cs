@@ -2,7 +2,7 @@
 
 namespace Github.Drawer.Abstractions
 {
-    interface ILogger
+    public interface ILogger
     {
         void Info(string message);
 

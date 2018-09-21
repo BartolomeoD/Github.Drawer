@@ -1,6 +1,8 @@
 ﻿using System.IO;
+using System.Linq;
 using System.Text;
 using Github.Drawer.Abstractions;
+using static System.Char;
 
 namespace Github.Drawer.Schema
 {
@@ -8,7 +10,7 @@ namespace Github.Drawer.Schema
     {
         private readonly ILogger _logger;
 
-        SchemaReader(ILogger logger)
+        public SchemaReader(ILogger logger)
         {
             _logger = logger;
         }
@@ -17,20 +19,23 @@ namespace Github.Drawer.Schema
         {
             var buffer = new byte[stream.Length];
             var result = stream.Read(buffer, 0, buffer.Length);
-            _logger.Info($"Result: {result}");
-            var rows = Encoding.UTF8.GetString(buffer, 0, buffer.Length).Split('\n');
-            if (rows.Length != 7)
+            _logger.Info($"Received symbols count: {result}");
+            var rows = Encoding.UTF8.GetString(buffer, 0, buffer.Length)
+                .Split('\n')
+                .Where(s => !string.IsNullOrEmpty(s));
+            if (rows.Count() != 7)
                 throw new SchemaException("Rows count should be 7");
-            var schema = new SchemaEntity(rows.Length);
-            for (var i = 0; i < rows.Length; i++)
+            var schema = new SchemaEntity(rows.First().Length);
+            var i = 0;
+            foreach (var row in rows)
             {
-                if (rows[i].Length > 52)
+                if (row.Length > 52)
                     throw new SchemaException("Rows length should be less than 53");
-
-                for (var k = 0; k < rows[i].Length; k++)
+                for (var k = 0; k < row.Length; k++)
                 {
-                    schema.Points[i, k] = (PointType) rows[i][k];
+                    schema.Points[i, k] = (PointType) GetNumericValue(row[k]);
                 }
+                i++;
             }
 
             return schema;

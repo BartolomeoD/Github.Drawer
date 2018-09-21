@@ -1,12 +1,15 @@
 ﻿using Autofac;
+using static System.Reflection.Assembly;
+using Module = Autofac.Module;
 
 namespace Github.Drawer
 {
-    class AutofacModule : Module
+    public class AutofacModule : Module
     {
         protected override void Load(ContainerBuilder builder)
         {
-            builder.RegisterAssemblyTypes()
+            builder.RegisterAssemblyTypes(
+                    GetAssembly(GetType()))
                 .AsImplementedInterfaces();
         }
     }

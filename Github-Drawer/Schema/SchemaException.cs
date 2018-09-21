@@ -2,7 +2,7 @@
 
 namespace Github.Drawer.Schema
 {
-    class SchemaException : Exception
+    public class SchemaException : Exception
     {
         public SchemaException(string message) : base(message)
         {
