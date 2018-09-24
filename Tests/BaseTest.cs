@@ -1,26 +1,18 @@
-
-using Autofac;
+﻿using Autofac;
 using Github.Drawer;
-using NUnit.Framework;
 
 namespace Tests
 {
-    [TestFixture]
     public class BaseTest
     {
         protected ContainerBuilder Builder;
         protected IContainer Container;
 
-        [SetUp]
-        public void _Setup()
+        public BaseTest()
         {
             Builder = new ContainerBuilder();
-            Builder.RegisterModule(new AutofacModule());
+            Builder.RegisterModule(new AutoFacModule());
             Container = Builder.Build();
-            Setup();
         }
-
-        protected virtual void Setup()
-        {}
     }
 }

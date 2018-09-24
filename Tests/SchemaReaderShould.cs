@@ -6,7 +6,7 @@ using Autofac;
 using FluentAssertions;
 using Github.Drawer.Abstractions;
 using Github.Drawer.Schema;
-using NUnit.Framework;
+using Xunit;
 
 namespace Tests
 {
@@ -15,7 +15,7 @@ namespace Tests
         protected ISchemaReader SchemaReader;
         protected string CorrectTestData;
 
-        protected override void Setup()
+        public SchemaReaderShould()
         {
             SchemaReader = Container.Resolve<ISchemaReader>();
             CorrectTestData = "0000000000000000000000000000000000000000000000000000" +
@@ -28,68 +28,88 @@ namespace Tests
                               "\n";
         }
 
-        [Test]
-        public void CorrectParse()
+        [Theory]
+        [MemberData(nameof(CorrectTestCases))]
+        private void Parse(TestCase testCase)
         {
-            var bytes = Encoding.UTF8.GetBytes(CorrectTestData);
-            var correctStream = new MemoryStream(bytes);
+            var schema = SchemaReader.Read((MemoryStream) testCase.Value);
 
-            var schema = SchemaReader.Read(correctStream);
-
-            schema.ToString().Should().BeEquivalentTo(CorrectTestData);
+            schema.ToString().Should().BeEquivalentTo((string) testCase.Expectation);
         }
 
-        [Test, TestCaseSource(nameof(ThrowableTestCases))]
-        public void ThrowSchemaException(Stream incorrectStream)
+        [Theory]
+        [MemberData(nameof(InCorrectTestCases))]
+        private void ParseThrows(TestCase testCase)
         {
-            Action act = () => SchemaReader.Read(incorrectStream);
-
-            act.Should().Throw<SchemaException>();
+            Assert.Throws((Type) testCase.Expectation, () => SchemaReader.Read((MemoryStream) testCase.Value));
         }
 
-        private static IEnumerable<TestCaseData> ThrowableTestCases()
+        public static IEnumerable<object[]> CorrectTestCases()
+        {
+            const string correctTestData = "0000000000000000000000000000000000000000000000000000" +
+                                           "\n0000000000000000000000000000000000000000000000000000" +
+                                           "\n0000000000000000000000000000000000000000000000000000" +
+                                           "\n0000000000000000000000000000000000000000000000000000" +
+                                           "\n0000000000000000000000000000000000000000000000000000" +
+                                           "\n0000000000000000000000000000000000000000000000000000" +
+                                           "\n0000000000000000000000000000000000000000000000000000" +
+                                           "\n";
+            yield return new object[]
+            {
+                new TestCase(CreateStream(correctTestData), correctTestData, "CorrectData"),
+            };
+
+            const string testDataWithInCorrectSymbol = "7000000000000000000000000000000000000000000000000000" +
+                                                       "\n0000000000000000000000000000000000000000000000000000" +
+                                                       "\n0000000000000000000000000000000000000000000000000000" +
+                                                       "\n0000000000000000000000000000000000000000000000000000" +
+                                                       "\n0000000000000000000000000000000000000000000000000000" +
+                                                       "\n0000000000000000000000000000000000000000000000000000" +
+                                                       "\n0000000000000000000000000000000000000000000000000000" +
+                                                       "\n";
+            yield return new object[]
+            {
+                new TestCase(CreateStream(testDataWithInCorrectSymbol), testDataWithInCorrectSymbol,
+                    "ContainsIncorrectSymbol"),
+            };
+        }
+
+        public static IEnumerable<object[]> InCorrectTestCases()
         {
             const string testDataWithSmallHeight = "0000000000000000000000000000000000000000000000000000" +
-                                                  "\n0000000000000000000000000000000000000000000000000000" +
-                                                  "\n0000000000000000000000000000000000000000000000000000" +
-                                                  "\n0000000000000000000000000000000000000000000000000000" +
-                                                  "\n0000000000000000000000000000000000000000000000000000" +
-                                                  "\n0000000000000000000000000000000000000000000000000000" +
-                                                  "\n";
-            var bytes = Encoding.UTF8.GetBytes(testDataWithSmallHeight);
-            var incorrectDataStream = new MemoryStream(bytes);
-            yield return new TestCaseData(incorrectDataStream)
-                .SetName("HeightSmallerThan7");
+                                                   "\n0000000000000000000000000000000000000000000000000000" +
+                                                   "\n0000000000000000000000000000000000000000000000000000" +
+                                                   "\n0000000000000000000000000000000000000000000000000000" +
+                                                   "\n0000000000000000000000000000000000000000000000000000" +
+                                                   "\n0000000000000000000000000000000000000000000000000000" +
+                                                   "\n";
+            yield return new object[]
+            {
+                new TestCase(CreateStream(testDataWithSmallHeight), typeof(SchemaException), "HeightIsSmallerThan7"),
+            };
 
             const string testDataWithBigHeight = "0000000000000000000000000000000000000000000000000000" +
-                                                "\n0000000000000000000000000000000000000000000000000000" +
-                                                "\n0000000000000000000000000000000000000000000000000000" +
-                                                "\n0000000000000000000000000000000000000000000000000000" +
-                                                "\n0000000000000000000000000000000000000000000000000000" +
-                                                "\n0000000000000000000000000000000000000000000000000000" +
-                                                "\n0000000000000000000000000000000000000000000000000000" +
-                                                "\n0000000000000000000000000000000000000000000000000000" +
-                                                "\n";
-            bytes = Encoding.UTF8.GetBytes(testDataWithBigHeight);
-            incorrectDataStream = new MemoryStream(bytes);
-            yield return new TestCaseData(incorrectDataStream)
-                .SetName("HeightBiggerThan7");
-            const string testDataWithInCorrectSymbol= "5000000000000000000000000000000000000000000000000000" +
-                                                "\n0000000000000000000000000000000000000000000000000000" +
-                                                "\n0000000000000000000000000000000000000000000000000000" +
-                                                "\n0000000000000000000000000000000000000000000000000000" +
-                                                "\n0000000000000000000000000000000000000000000000000000" +
-                                                "\n0000000000000000000000000000000000000000000000000000" +
-                                                "\n0000000000000000000000000000000000000000000000000000" +
-                                                "\n";
-            bytes = Encoding.UTF8.GetBytes(testDataWithInCorrectSymbol);
-            incorrectDataStream = new MemoryStream(bytes);
-            yield return new TestCaseData(incorrectDataStream)
-                .SetName("WithIncorrectSymbol");
+                                                 "\n0000000000000000000000000000000000000000000000000000" +
+                                                 "\n0000000000000000000000000000000000000000000000000000" +
+                                                 "\n0000000000000000000000000000000000000000000000000000" +
+                                                 "\n0000000000000000000000000000000000000000000000000000" +
+                                                 "\n0000000000000000000000000000000000000000000000000000" +
+                                                 "\n0000000000000000000000000000000000000000000000000000" +
+                                                 "\n0000000000000000000000000000000000000000000000000000" +
+                                                 "\n";
+            yield return new object[]
+            {
+                new TestCase(CreateStream(testDataWithBigHeight), typeof(SchemaException), "HeightIsBiggerThan7"),
+            };
         }
 
-        [Test]
-        [Ignore("Чтобы создать строку")]
+        private static MemoryStream CreateStream(string dataString)
+        {
+            var bytes = Encoding.UTF8.GetBytes(dataString);
+            return new MemoryStream(bytes);
+        }
+
+        [Fact(Skip = "Чтобы создать строку")]
         public void Test()
         {
             var stringBuilder = new StringBuilder();

@@ -4,7 +4,7 @@ using Module = Autofac.Module;
 
 namespace Github.Drawer
 {
-    public class AutofacModule : Module
+    public class AutoFacModule : Module
     {
         protected override void Load(ContainerBuilder builder)
         {

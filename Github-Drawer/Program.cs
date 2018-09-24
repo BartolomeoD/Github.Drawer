@@ -17,7 +17,7 @@ namespace Github.Drawer
         static void Configure()
         {
             _builder = new ContainerBuilder();
-            _builder.RegisterModule(new AutofacModule());
+            _builder.RegisterModule(new AutoFacModule());
             _container = _builder.Build();
         }
 
