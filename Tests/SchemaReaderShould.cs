@@ -7,6 +7,7 @@ using FluentAssertions;
 using Github.Drawer.Abstractions;
 using Github.Drawer.Schema;
 using Xunit;
+using Xunit.Abstractions;
 
 namespace Tests
 {
@@ -15,7 +16,7 @@ namespace Tests
         protected ISchemaReader SchemaReader;
         protected string CorrectTestData;
 
-        public SchemaReaderShould()
+        public SchemaReaderShould(ITestOutputHelper outputHelper) : base(outputHelper)
         {
             SchemaReader = Container.Resolve<ISchemaReader>();
             CorrectTestData = "0000000000000000000000000000000000000000000000000000" +

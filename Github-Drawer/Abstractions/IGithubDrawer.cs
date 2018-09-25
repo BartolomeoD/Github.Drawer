@@ -1,6 +1,6 @@
 ﻿namespace Github.Drawer.Abstractions
 {
-    interface IGithubDrawer
+    public interface IGithubDrawer
     {
         void Draw(string filePath);
     }
