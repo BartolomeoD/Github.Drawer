@@ -1,5 +1,9 @@
-﻿using Autofac;
+﻿using System;
+using System.Collections.Generic;
+using Autofac;
+using FluentAssertions;
 using Github.Drawer.Abstractions;
+using Github.Drawer.Points;
 using Github.Drawer.Schema;
 using Xunit;
 using Xunit.Abstractions;
@@ -13,20 +17,23 @@ namespace Tests
         public PointPositionsCalculatorShould(ITestOutputHelper outputHelper) : base(outputHelper)
         {
             PointPositionsCalculator = Container.Resolve<IPointPositionCalculator>();
+            MockFakeDateTimeProvider.Setup(mock => mock.GetToday()).Returns(new DateTime(2018, 9, 25));
         }
 
         [Fact]
-        public void Test()
+        public void ReturnCorrectData()
         {
             var schema = CreateEmptySchema();
             schema.Points[0, 0] = PointType.darkest;
             schema.Points[3, 4] = PointType.dusky;
 
             var points = PointPositionsCalculator.Handle(schema);
-            foreach (var pointPosition in points)
+
+            points.Should().BeEquivalentTo(new List<PointPosition>
             {
-                Output.WriteLine(pointPosition.ToString());
-            }
+                new PointPosition(0, 0, Saturation.Deep, new DateTime(2017,9,24)),
+                new PointPosition(4, 3, Saturation.MidDeep, new DateTime(2017,10,25))
+            });
         }
 
         private static SchemaEntity CreateEmptySchema()
@@ -39,7 +46,6 @@ namespace Tests
                     schema.Points[dayIndex, weekIndex] = PointType.empty;
                 }
             }
-
             return schema;
         }
     }

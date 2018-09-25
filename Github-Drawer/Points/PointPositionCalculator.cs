@@ -7,19 +7,21 @@ namespace Github.Drawer.Points
 {
     public class PointPositionCalculator : IPointPositionCalculator
     {
-        private readonly int _supposedWeeksCountInGithubTable = 53;
+        private const int SupposedWeeksCountInGithubTable = 53;
 
         private readonly ILogger _logger;
+        private readonly IDateTimeProvider _dateTimeProvider;
 
-        public PointPositionCalculator(ILogger logger)
+        public PointPositionCalculator(ILogger logger, IDateTimeProvider dateTimeProvider)
         {
             _logger = logger;
+            _dateTimeProvider = dateTimeProvider;
         }
 
         public IEnumerable<PointPosition> Handle(SchemaEntity schema)
         {
-            var now = DateTime.Today;
-            var supposedDaysInGithubTable = _supposedWeeksCountInGithubTable * 7;
+            var now = _dateTimeProvider.GetToday();
+            var supposedDaysInGithubTable = SupposedWeeksCountInGithubTable * 7;
             var supposedWeek = now.AddDays(-supposedDaysInGithubTable);
             _logger.Info($"Supposed last week hidden in github table: {supposedWeek.ToLongTimeString()}");
             var startTableDay = FindNextDateByDayOfWeek(supposedWeek, DayOfWeek.Sunday);
@@ -37,11 +39,9 @@ namespace Github.Drawer.Points
                             (Saturation) schema.Points[dayIndex, weekIndex] - 1, currentDay);
                         pointsPositions.Add(point);
                     }
-
                     currentDay = currentDay.AddDays(1);
                 }
             }
-
             return pointsPositions;
         }
 
