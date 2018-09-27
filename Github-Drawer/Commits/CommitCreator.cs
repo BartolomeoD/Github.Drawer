@@ -35,7 +35,7 @@ namespace Github.Drawer.Commits
                 {
                     FileManager.Rewrite(Path.Combine(repository.Info.WorkingDirectory, fileName),
                         $"Commit #{commitNumber}");
-                    repository.Index.Add(fileName);
+                    Commands.Stage(repository, fileName);
                     var signature = new Signature(userName, userEmail, pointPosition.CommitDateTime);
                     repository.Commit($"Commit #{commitNumber}", signature, signature);
                     commitNumber++;

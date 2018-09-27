@@ -26,5 +26,15 @@ namespace Github.Drawer.Helpers
         {
             return File.OpenRead(filePath);
         }
+
+        public static bool IsExist(string path)
+        {
+            return Directory.Exists(path);
+        }
+
+        public static void RemoveDirectory(string path)
+        {
+            Directory.Delete(path);
+        }
     }
 }

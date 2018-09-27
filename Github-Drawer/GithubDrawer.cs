@@ -31,6 +31,8 @@ namespace Github.Drawer
             }
 
             var points = _pointPositionCalculator.Handle(schema);
+            if (FileManager.IsExist(configuration.DirectoryPath))
+                FileManager.RemoveDirectory(configuration.DirectoryPath);
             FileManager.CreateDirectory(configuration.DirectoryPath);
             using (var repo = new Repository(Repository.Init(configuration.DirectoryPath)))
             {
