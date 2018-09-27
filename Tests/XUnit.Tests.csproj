@@ -23,7 +23,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Github-Drawer\Github.Drawer.csproj" />
+    <ProjectReference Include="..\GithubDrawer\GithubDrawer.csproj" />
   </ItemGroup>
 
 </Project>
