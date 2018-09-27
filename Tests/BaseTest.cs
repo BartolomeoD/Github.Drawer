@@ -15,10 +15,12 @@ namespace Tests
 
         public BaseTest(ITestOutputHelper output)
         {
+            var config = new Configuration(maxCommitsCount: 10, fileName: "", directoryPath: "");
             MockFakeDateTimeProvider = new Mock<IDateTimeProvider>();
             Builder = new ContainerBuilder();
             Builder.RegisterModule(new AutoFacModule());
             Builder.RegisterInstance(MockFakeDateTimeProvider.Object).As<IDateTimeProvider>();
+            Builder.RegisterInstance(config).As<Configuration>();
             Container = Builder.Build();
             Output = output;
         }

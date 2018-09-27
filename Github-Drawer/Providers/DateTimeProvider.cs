@@ -9,5 +9,10 @@ namespace Github.Drawer.Providers
         {
             return DateTime.Today;
         }
+
+        public DateTime GetNow()
+        {
+            return DateTime.Now;
+        }
     }
 }

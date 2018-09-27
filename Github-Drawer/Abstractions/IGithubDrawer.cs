@@ -2,6 +2,6 @@
 {
     public interface IGithubDrawer
     {
-        void Draw(string filePath);
+        void Draw(Configuration configuration);
     }
 }

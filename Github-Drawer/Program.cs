@@ -4,36 +4,48 @@ using Github.Drawer.Abstractions;
 
 namespace Github.Drawer
 {
-    class Program
+    public class Program
     {
         private static ContainerBuilder _builder;
         private static IContainer _container;
 
         public static void Main(string[] args)
         {
-            Configure();
+            var config = new Configuration()
+            {
+                MaxCommitsCount = 10,
+                SchemaFilePath = "example.txt",
+                UserEmail = "test",
+                UserName = "test",
+                FileName = "alone_file.txt",
+                DirectoryPath = "test"
+            };
+            ConfigureContainer();
+            Draw(config);
         }
 
-        static void Configure()
+        private static void ConfigureContainer()
         {
             _builder = new ContainerBuilder();
             _builder.RegisterModule(new AutoFacModule());
             _container = _builder.Build();
         }
 
-        static void Draw()
+        static void Draw(Configuration configuration)
         {
             var drawer = _container.Resolve<IGithubDrawer>();
             var logger = _container.Resolve<ILogger>();
 
             try
             {
-                drawer.Draw("asdasd");
+                drawer.Draw(configuration);
             }
             catch (Exception e)
             {
                 logger.Error("Operations cancelled", e);
             }
+
+            Console.ReadKey();
         }
     }
 }

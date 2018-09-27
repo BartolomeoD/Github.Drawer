@@ -22,6 +22,7 @@ namespace Github.Drawer.Schema
             _logger.Info($"Received symbols count: {result}");
             var rows = Encoding.UTF8.GetString(buffer, 0, buffer.Length)
                 .Split('\n')
+                .Select(str => str.Replace("\r", ""))
                 .Where(s => !string.IsNullOrEmpty(s));
             if (rows.Count() != 7)
                 throw new SchemaException("Rows count should be 7");
