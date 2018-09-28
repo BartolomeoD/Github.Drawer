@@ -35,3 +35,4 @@ namespace Github.Drawer
             return stringBuilder.ToString();
         }
     }
+}
