@@ -1,5 +1,6 @@
 ﻿using System;
 using Autofac;
+using Fclp;
 using Github.Drawer.Abstractions;
 
 namespace Github.Drawer
@@ -11,17 +12,52 @@ namespace Github.Drawer
 
         public static void Main(string[] args)
         {
-            var config = new Configuration()
+            var config = new FluentCommandLineParser<Configuration>();
+            config.Setup(arg => arg.MaxCommitsCount)
+                .As(CaseType.CaseInsensitive, "max-commit-count", "commit")
+                .WithDescription("Maximum commits in one day in last year (Darkest cell in table)")
+                .SetDefault(4);
+
+            config.Setup(arg => arg.SchemaFilePath)
+                .As(CaseType.CaseInsensitive, "schema")
+                .WithDescription("path to schema. Default set to \"example.txt\". See for understanding.")
+                .SetDefault("example.txt");
+
+            config.Setup(arg => arg.UserEmail)
+                .As(CaseType.CaseInsensitive, "user-email", "e")
+                .WithDescription(
+                    "github`s account user email. it is safe. it using to signature commits. And github will correctly recognize commits")
+                .Required();
+
+            config.Setup(arg => arg.UserName)
+                .As(CaseType.CaseInsensitive, "user-name", "n")
+                .WithDescription(
+                    "github`s account user name. same as email, it is safe. it using to signature commits. And github will correctly recognize commits")
+                .Required();
+
+            config.Setup(arg => arg.FileName)
+                .As(CaseType.CaseInsensitive, "file-name")
+                .WithDescription("Default set to \"alone_file.txt\". File name that contains all commits.")
+                .SetDefault("alone_file.txt");
+
+            config.Setup(arg => arg.DirectoryPath)
+                .As(CaseType.CaseInsensitive, "directory-path")
+                .WithDescription("repository`s directory name, where will be your project. Default set to \"push_me\"")
+                .SetDefault("push_me");
+
+            config.SetupHelp("h", "help")
+                .Callback(text => Console.WriteLine(text));
+
+            var result = config.Parse(args);
+            Console.WriteLine(config.Object.ToString());
+            if (result.HasErrors)
             {
-                MaxCommitsCount = 10,
-                SchemaFilePath = "example.txt",
-                UserEmail = "test",
-                UserName = "test",
-                FileName = "alone_file.txt",
-                DirectoryPath = "test"
-            };
+                Console.WriteLine("There is error in input data, check -h for information");
+                return;
+            }
+            Console.WriteLine("After creating project you should push it in your github account");
             ConfigureContainer();
-            Draw(config);
+            Draw(config.Object);
         }
 
         private static void ConfigureContainer()
@@ -44,8 +80,6 @@ namespace Github.Drawer
             {
                 logger.Error("Operations cancelled", e);
             }
-
-            Console.ReadKey();
         }
     }
 }

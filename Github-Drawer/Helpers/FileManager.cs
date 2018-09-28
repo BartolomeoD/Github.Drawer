@@ -34,7 +34,7 @@ namespace Github.Drawer.Helpers
 
         public static void RemoveDirectory(string path)
         {
-            Directory.Delete(path);
+            Directory.Delete(path, true);
         }
     }
 }

@@ -23,9 +23,9 @@ namespace Github.Drawer.Points
             var now = _dateTimeProvider.GetToday();
             var supposedDaysInGithubTable = SupposedWeeksCountInGithubTable * 7;
             var supposedWeek = now.AddDays(-supposedDaysInGithubTable);
-            _logger.Info($"Supposed last week hidden in github table: {supposedWeek.ToLongTimeString()}");
+            _logger.Info($"Supposed last week hidden in github table: {supposedWeek.ToShortDateString()}");
             var startTableDay = FindNextDateByDayOfWeek(supposedWeek, DayOfWeek.Sunday);
-            _logger.Info($"Start table day: {startTableDay.ToLongTimeString()}");
+            _logger.Info($"Start table day: {startTableDay.ToShortDateString()}");
 
             var pointsPositions = new List<PointPosition>();
             var currentDay = startTableDay;

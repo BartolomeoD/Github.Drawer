@@ -42,7 +42,7 @@ namespace Github.Drawer.Commits
                 }
             }
 
-            _logger.Info($"Successfully created {commitNumber}");
+            _logger.Info($"Successfully created {commitNumber} commits");
         }
     }
 }
