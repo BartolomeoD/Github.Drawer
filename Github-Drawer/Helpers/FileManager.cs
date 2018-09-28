@@ -36,5 +36,10 @@ namespace Github.Drawer.Helpers
         {
             Directory.Delete(path, true);
         }
+
+        public static void CopyFile(string filePath, string toPath)
+        {
+            File.Copy(filePath,toPath);
+        }
     }
 }

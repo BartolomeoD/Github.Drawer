@@ -1,4 +1,6 @@
-﻿using Github.Drawer.Abstractions;
+﻿using System;
+using System.IO;
+using Github.Drawer.Abstractions;
 using Github.Drawer.Helpers;
 using Github.Drawer.Schema;
 using LibGit2Sharp;
@@ -32,10 +34,12 @@ namespace Github.Drawer
 
             var points = _pointPositionCalculator.Handle(schema);
             if (FileManager.IsExist(configuration.DirectoryPath))
-                FileManager.RemoveDirectory(configuration.DirectoryPath);
+                throw new Exception("Такая папка уже существует");
             FileManager.CreateDirectory(configuration.DirectoryPath);
+            FileManager.CopyFile("readme.md", Path.Combine(configuration.DirectoryPath, "readme.md"));
             using (var repo = new Repository(Repository.Init(configuration.DirectoryPath)))
             {
+                Commands.Stage(repo, "readme.md");
                 var maxCommitsCount = configuration.MaxCommitsCount > 4 ? configuration.MaxCommitsCount : 4;
                 _commitCreator.Create(points, repo, maxCommitsCount, configuration.FileName, configuration.UserName,
                     configuration.UserEmail);

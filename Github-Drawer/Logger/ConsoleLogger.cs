@@ -13,7 +13,8 @@ namespace Github.Drawer.Logger
         public void Error(string message, Exception exception)
         {
             Console.WriteLine($"[Error] Message: {message}");
-            Error(exception);
+            Console.WriteLine($"[Error] Exception message: {exception.Message}");
+            //Error(exception);
         }
 
         public void Error(Exception exception)
